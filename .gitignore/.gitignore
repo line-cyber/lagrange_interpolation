@@ -1,0 +1,98 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <vector>
+#include <stdio.h>
+using namespace std;
+long long int  gcd(long long int  a, long long int  b)
+{
+    // Расширенный алгоритм Евклида, решает уравнения а*х+b*y= nod(a,b)
+    long long int  p=1, q=0, r=0, s=1, x, y;
+    while (a && b) {
+        if (a>=b) {
+            a = a - b;
+            p = p - r;
+            q = q - s;
+        } else
+        {
+            b = b - a;
+            r = r - p;
+            s = s - q;
+        }
+    }
+    if (a) 
+    {
+        x = p;
+        y = q;
+    }
+    else
+    {
+        x = r;
+        y = s;
+    }
+    //prlong long int f("%d %d\n", x, y);
+    return x;
+}
+long long int  Nod(long long int  a, long long int  b)
+{
+    long long int  t;
+    if (a < b) { t = a; a = b; b = t; }
+    while (b != 0) {
+        t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+int  main()
+{
+    long long int  p, a, N, x, y, xi, chisl = 1, znam = 1;
+    vector<long long int > X, Y;
+    setlocale(LC_ALL, "ru");
+    ////////////////////////////////////////Чтение из файла 
+    freopen("input.txt", "r", stdin);
+    cin >> p >> a >> N;
+    for (long long int  i = 0; i < N; ++i) 
+    {
+        cin >> x >> y;
+        X.push_back(x);  Y.push_back(y);
+    }
+    long int result = 0;
+    ////////////////////////////////// По формуле вычисляем значения в точке "а" , в результате у нас получиться дробь 
+    for (long long int  i = 0; i < N; i++)
+    {
+        xi = X[i];
+        for (long long int  j = 0; j < N; j++)
+        {
+            if (X[j] != xi)
+            {
+                long long int  ss = a - X[j];  long long int  kk = xi - X[j];
+                chisl *= (ss);
+                znam *= (kk);
+                int nod=Nod(chisl, znam);
+                chisl /= nod;
+                znam /= nod;
+                chisl %= p;
+                znam %= p;
+            }
+        }
+        chisl = Y[i] * chisl % p;
+        if (chisl < 0) //  если числитель меньше 0 добавляем р , чтобы было положительное число
+            chisl = chisl + p;
+        if (znam < 0) 
+             znam = znam + p;
+        if (znam != 1)///Если знаменатель не равень 1 , то находим с чем сравнимо число 1/znam по модулю  р, с помощью  расширю Алг. Евклида
+        {
+            long long int  X = gcd(znam, p) % p; /// Решает уравнения типа:  znam*x + p*y= 1 и возвращает число X
+            if (X < 0)
+                X += p;
+            //Сейчас и числитель (сhisl ) и знаменатель ( X )  лежать в Zp , перемножим и результать ещё раз поделим по модулю р
+           result+=chisl * X % p;
+        }
+        chisl = 1; znam = 1;
+    }
+    result %= p;
+    cout << "Ответ : " << result << endl;
+    getchar();
+}
+
+
