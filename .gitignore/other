@@ -1,0 +1,133 @@
+// lagrange_.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
+//
+#include<fstream>
+#include <iostream>
+#include <math.h>
+using namespace std;
+
+long long int  gcd(long long int  a, long long int  b)
+{
+	// Расширенный алгоритм Евклида
+	long long int  p = 1, q = 0, r = 0, s = 1, x;
+	while (a && b) 
+	{
+		if (a >= b) {
+			a = a - b;
+			p = p - r;
+			q = q - s;
+		}
+		else
+		{
+			b = b - a;
+			r = r - p;
+			s = s - q;
+		}
+	}
+	if (a)
+	{
+		x = p;
+	}
+	else
+	{
+		x = r;
+	}
+	return x;
+}
+long long int  Nod(long long int  a, long long int  b)
+{
+	long long int  t;
+	if (a < b) { t = a; a = b; b = t; }
+	while (b != 0) 
+	{
+		t = b;
+		b = a % b;
+		a = t;
+	}
+	return a;
+}
+
+
+int main()
+{
+
+	ifstream in("test.txt");
+	ofstream out("test_out.txt");
+	long long int MOD;
+	in >> MOD;
+
+	long long int a;
+	in >> a;
+
+	long long int n;
+	in >> n;
+
+	
+	    long long int *X = new long long int[n];
+		long long int *Y = new long long int[n];
+
+		
+		for (long long int i = 0; i < n; i++)
+		{
+
+			in >> X[i];
+			in >> Y[i];
+		}
+
+		for (long long int i = 0; i < n; i++)
+		{
+			out << "x" << i << ":" << X[i] << " ";
+
+		}
+		out << "\n";
+
+		for (long long int i = 0; i < n; i++)
+		{
+			out << "y" << i << ":" << Y[i] << " ";
+		}
+		out << "\n";
+		long long int  xi, chisl = 1, znam = 1;
+		long int result = 0;
+		//По формуле вычисляем значения в точке а
+		for (long long int i = 0; i < n; i++)
+		{
+			xi = X[i];
+			for (long long int j = 0; j < n; j++)
+			{
+				if (X[j] != xi)
+				{
+					long long int  ss = a - X[j];  
+					long long int  kk = xi - X[j];
+					chisl *= (ss);
+					znam *= (kk);
+					int nod = Nod(chisl, znam);
+					chisl /= nod;
+					znam /= nod;
+					chisl %= MOD;
+					znam %= MOD;
+				}
+			}
+		
+			chisl = Y[i] * chisl % MOD;
+			if (chisl < 0) // числитель меньше 0 
+				chisl = chisl + MOD;
+			if (znam < 0)
+				znam = znam + MOD;
+			if (znam != 1)//знаменатель не равен 1 
+			{
+				long long int  X = gcd(znam, MOD) % MOD; // 
+				if (X < 0)
+					X += MOD;
+				// числитель (сhisl ) и знаменатель (X) в Zp 
+				result += chisl * X % MOD;
+			}
+			chisl = 1; znam = 1;
+		}
+		result %= MOD;
+		cout << "Result " << result<<"\n";
+		out << result;
+		out << "\n";
+		
+	
+	return 0;
+}
+
